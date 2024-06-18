@@ -13,6 +13,7 @@ async function getRunner(label) {
     const foundRunners = _.filter(runners, { labels: [{ name: label }] });
     return foundRunners.length > 0 ? foundRunners[0] : null;
   } catch (error) {
+    core.error(`Error getting runner: ${error.message}`);
     return null;
   }
 }
