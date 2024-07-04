@@ -25,9 +25,9 @@ inputs:
       EC2 Instance Type.
       This input is required if you use the 'start' mode.
     required: false
-  subnet-id:
+  subnet-ids:
     description: >-
-      VPC Subnet Id. The subnet should belong to the same VPC as the specified security group.
+      VPC Subnet Ids. The runner will be launched in one of the specified subnets.
       This input is required if you use the 'start' mode.
     required: false
   security-group-id:
