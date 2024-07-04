@@ -20,9 +20,9 @@ inputs:
       EC2 Image Id (AMI). The new runner will be launched from this image.
       This input is required if you use the 'start' mode.
     required: false
-  ec2-instance-type:
+  ec2-instance-types:
     description: >-
-      EC2 Instance Type.
+      EC2 Instance Types. The runner will be launched on the instance of this type.
       This input is required if you use the 'start' mode.
     required: false
   subnet-id:
