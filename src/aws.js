@@ -23,8 +23,8 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `echo "${config.input.preRunnerScript}" > pre-runner-script.sh`,
       'source pre-runner-script.sh',
       'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
-      'curl -O -L https://github.com/actions/runner/releases/download/v2.299.1/actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
-      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
+      'curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-${RUNNER_ARCH}-2.317.0.tar.gz',
+      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.317.0.tar.gz',
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label}`,
       './run.sh',
@@ -66,7 +66,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
     };
 
     try {
-      const result = await ec2.runInstances(params);
+      const result = await ec2.runInstances(params).promise();
       const ec2InstanceId = result.Instances[0].InstanceId;
       core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} is started`);
       return ec2InstanceId;
@@ -74,7 +74,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
       if (error.code === 'InsufficientInstanceCapacity') {
         core.warning(`Insufficient capacity for instance type ${instanceType}, trying next type...`);
       } else {
-        core.error('AWS EC2 instance starting error');
+        core.error('AWS EC2 instance starting error: ' + error.message);
         throw error;
       }
     }
@@ -91,11 +91,11 @@ async function terminateEc2Instance() {
   };
 
   try {
-    await ec2.terminateInstances(params);
+    await ec2.terminateInstances(params).promise();
     core.info(`AWS EC2 instance ${config.input.ec2InstanceId} is terminated`);
     return;
   } catch (error) {
-    core.error(`AWS EC2 instance ${config.input.ec2InstanceId} termination error`);
+    core.error(`AWS EC2 instance ${config.input.ec2InstanceId} termination error: ${error.message}`);
     throw error;
   }
 }
@@ -115,7 +115,7 @@ async function waitForInstanceRunning(ec2InstanceId) {
     core.info(`AWS EC2 instance ${ec2InstanceId} is up and running`);
     return;
   } catch (error) {
-    core.error(`AWS EC2 instance ${ec2InstanceId} initialization error`);
+    core.error(`AWS EC2 instance ${ec2InstanceId} initialization error: ${error.message}`);
     throw error;
   }
 }
