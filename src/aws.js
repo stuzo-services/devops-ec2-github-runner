@@ -71,7 +71,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
       core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} is started`);
       return ec2InstanceId;
     } catch (error) {
-      if (error.code === 'InsufficientInstanceCapacity') {
+      if (error.name === 'InsufficientInstanceCapacity') {
         core.warning(`Insufficient capacity for instance type ${instanceType}, trying next type...`);
       } else {
         core.error('AWS EC2 instance starting error: ' + error.message);
