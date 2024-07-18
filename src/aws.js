@@ -66,12 +66,12 @@ async function startEc2Instance(label, githubRegistrationToken) {
     };
 
     try {
-      const result = await ec2.runInstances(params).promise();
+      const result = await ec2.runInstances(params);
       const ec2InstanceId = result.Instances[0].InstanceId;
       core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} is started`);
       return ec2InstanceId;
     } catch (error) {
-      if (error.code === 'InsufficientInstanceCapacity') {
+      if (error.name === 'InsufficientInstanceCapacity') {
         core.warning(`Insufficient capacity for instance type ${instanceType}, trying next type...`);
       } else {
         core.error('AWS EC2 instance starting error: ' + error.message);
@@ -91,7 +91,7 @@ async function terminateEc2Instance() {
   };
 
   try {
-    await ec2.terminateInstances(params).promise();
+    await ec2.terminateInstances(params);
     core.info(`AWS EC2 instance ${config.input.ec2InstanceId} is terminated`);
     return;
   } catch (error) {
