@@ -48,7 +48,8 @@ function buildMarketOptions() {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
   const userData = buildUserDataScript(githubRegistrationToken, label);
-
+  const subnets = JSON.parse(config.input.subnetIds);
+  const subnetId = subnets[Math.floor(Math.random() * subnets.length)];
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
 
   for (const instanceType of instanceTypes) {
@@ -58,7 +59,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
       MinCount: 1,
       MaxCount: 1,
       UserData: Buffer.from(userData.join('\n')).toString('base64'),
-      SubnetId: JSON.parse(config.input.subnetIds)[Math.floor(Math.random() * JSON.parse(config.input.subnetIds).length)],
+      SubnetId: subnetId,
       SecurityGroupIds: [config.input.securityGroupId],
       IamInstanceProfile: { Name: config.input.iamRoleName },
       TagSpecifications: config.tagSpecifications,
