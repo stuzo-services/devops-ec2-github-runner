@@ -3,7 +3,6 @@ const github = require('@actions/github');
 
 class Config {
   constructor() {
-    const subnetIdsRaw = core.getInput('subnet-ids');
     this.input = {
       mode: core.getInput('mode'),
       githubToken: core.getInput('github-token'),
