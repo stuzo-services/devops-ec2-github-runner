@@ -47,6 +47,7 @@ function buildMarketOptions() {
 
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
+  core.info("🚀 startEc2Instance called");
   const userData = buildUserDataScript(githubRegistrationToken, label);
   const subnetIds = JSON.parse(config.input.subnetIds);
   const randomIndex = Math.floor(Math.random() * subnetIds.length);
