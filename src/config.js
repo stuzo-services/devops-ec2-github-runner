@@ -3,12 +3,17 @@ const github = require('@actions/github');
 
 class Config {
   constructor() {
+    const subnetIdsRaw = core.getInput('subnet-ids');
+    const subnetList = JSON.parse(subnetIdsRaw);
+    const selectedSubnetId = subnetList[Math.floor(Math.random() * subnetList.length)];
+
     this.input = {
       mode: core.getInput('mode'),
       githubToken: core.getInput('github-token'),
       ec2ImageId: core.getInput('ec2-image-id'),
       ec2InstanceTypes: core.getInput('ec2-instance-types'),
-      subnetIds: core.getInput('subnet-ids'),
+      // subnetIds: core.getInput('subnet-ids'),
+      subnetIds: selectedSubnetId,
       securityGroupId: core.getInput('security-group-id'),
       label: core.getInput('label'),
       ec2InstanceId: core.getInput('ec2-instance-id'),
@@ -34,11 +39,7 @@ class Config {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
     };
-    //
-    // Randomly pick a subnet (no validation)
-    //
-    const parsedSubnets = JSON.parse(this.input.subnetIds);
-    this.input.selectedSubnetId = parsedSubnets[Math.floor(Math.random() * parsedSubnets.length)];
+
     //
     // validate input
     //
