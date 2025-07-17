@@ -59,7 +59,6 @@ async function startEc2Instance(label, githubRegistrationToken) {
       MaxCount: 1,
       UserData: Buffer.from(userData.join('\n')).toString('base64'),
       SubnetId: JSON.parse(config.input.subnetIds)[Math.floor(Math.random() * JSON.parse(config.input.subnetIds).length)],
-      //SubnetId: config.input.subnetIds,
       SecurityGroupIds: [config.input.securityGroupId],
       IamInstanceProfile: { Name: config.input.iamRoleName },
       TagSpecifications: config.tagSpecifications,
