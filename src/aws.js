@@ -48,8 +48,6 @@ function buildMarketOptions() {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
   const userData = buildUserDataScript(githubRegistrationToken, label);
-  // const subnets = JSON.parse(config.input.subnetIds);
-  // const subnetId = subnets[Math.floor(Math.random() * subnets.length)];
   const subnetIds = JSON.parse(config.input.subnetIds); 
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
 
