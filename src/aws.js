@@ -51,6 +51,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
   const subnetIds = JSON.parse(config.input.subnetIds);
   const randomIndex = Math.floor(Math.random() * subnetIds.length);
   const selectedSubnet = subnetIds[randomIndex];
+  console.log("Randomly selected subnet:", selectedSubnet);
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
 
   for (const instanceType of instanceTypes) {
