@@ -47,12 +47,8 @@ function buildMarketOptions() {
 
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
-  core.info("🚀 startEc2Instance called");
   const userData = buildUserDataScript(githubRegistrationToken, label);
-  const subnetIds = JSON.parse(config.input.subnetIds);
-  const randomIndex = Math.floor(Math.random() * subnetIds.length);
-  const selectedSubnet = subnetIds[randomIndex];
-  console.log("Randomly selected subnet:", selectedSubnet);
+
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
 
   for (const instanceType of instanceTypes) {
@@ -62,7 +58,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
       MinCount: 1,
       MaxCount: 1,
       UserData: Buffer.from(userData.join('\n')).toString('base64'),
-      SubnetId: selectedSubnet,
+      SubnetId: config.input.selectedSubnetId,
       SecurityGroupIds: [config.input.securityGroupId],
       IamInstanceProfile: { Name: config.input.iamRoleName },
       TagSpecifications: config.tagSpecifications,

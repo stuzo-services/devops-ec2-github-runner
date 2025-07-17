@@ -34,7 +34,11 @@ class Config {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
     };
-
+    //
+    // Randomly pick a subnet (no validation)
+    //
+    const parsedSubnets = JSON.parse(this.input.subnetIds);
+    this.input.selectedSubnetId = parsedSubnets[Math.floor(Math.random() * parsedSubnets.length)];
     //
     // validate input
     //
