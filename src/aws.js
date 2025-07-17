@@ -48,34 +48,37 @@ function buildMarketOptions() {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
   const userData = buildUserDataScript(githubRegistrationToken, label);
-
+  const subnetIds = JSON.parse(config.input.subnetIds); 
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
 
+  
   for (const instanceType of instanceTypes) {
-    const params = {
-      ImageId: config.input.ec2ImageId,
-      InstanceType: instanceType,
-      MinCount: 1,
-      MaxCount: 1,
-      UserData: Buffer.from(userData.join('\n')).toString('base64'),
-      SubnetIds: JSON.parse(config.input.subnetIds),
-      SecurityGroupIds: [config.input.securityGroupId],
-      IamInstanceProfile: { Name: config.input.iamRoleName },
-      TagSpecifications: config.tagSpecifications,
-      InstanceMarketOptions: buildMarketOptions(),
-    };
+    for (const subnetId of subnetIds) {
+      const params = {
+        ImageId: config.input.ec2ImageId,
+        InstanceType: instanceType,
+        MinCount: 1,
+        MaxCount: 1,
+        UserData: Buffer.from(userData.join('\n')).toString('base64'),
+        SubnetId: subnetId,
+        SecurityGroupIds: [config.input.securityGroupId],
+        IamInstanceProfile: { Name: config.input.iamRoleName },
+        TagSpecifications: config.tagSpecifications,
+        InstanceMarketOptions: buildMarketOptions(),
+      };
 
-    try {
-      const result = await ec2.runInstances(params);
-      const ec2InstanceId = result.Instances[0].InstanceId;
-      core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} is started`);
-      return ec2InstanceId;
-    } catch (error) {
-      if (error.name === 'InsufficientInstanceCapacity') {
-        core.warning(`Insufficient capacity for instance type ${instanceType}, trying next type...`);
-      } else {
-        core.error('AWS EC2 instance starting error: ' + error.message);
-        throw error;
+      try {
+        const result = await ec2.runInstances(params);
+        const ec2InstanceId = result.Instances[0].InstanceId;
+        core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} started in subnet ${subnetId}`);
+        return ec2InstanceId;
+      } catch (error) {
+        if (error.name === 'InsufficientInstanceCapacity') {
+          core.warning(`Insufficient capacity for instance type ${instanceType} in subnet ${subnetId}, trying next...`);
+        } else {
+          core.error(`Failed to start instance type ${instanceType} in subnet ${subnetId}: ${error.message}`);
+          throw error;
+        }
       }
     }
   }
