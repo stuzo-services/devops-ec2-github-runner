@@ -50,6 +50,15 @@ async function startEc2Instance(label, githubRegistrationToken) {
   const userData = buildUserDataScript(githubRegistrationToken, label);
   const subnetIds = JSON.parse(config.input.subnetIds); 
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
+  const volumeSize = parseInt(config.input.ebsVolumeSize, 10);
+  const blockDeviceMappings = Number.isInteger(volumeSize)
+    ? [
+        {
+          DeviceName: config.input.ebsVolumeDeviceName,
+          Ebs: { VolumeSize: volumeSize }
+        }
+      ]
+    : undefined; // Let AMI default be used
 
   
   for (const instanceType of instanceTypes) {
@@ -65,6 +74,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
         IamInstanceProfile: { Name: config.input.iamRoleName },
         TagSpecifications: config.tagSpecifications,
         InstanceMarketOptions: buildMarketOptions(),
+        BlockDeviceMappings: blockDeviceMappings,
       };
 
       try {
