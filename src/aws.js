@@ -50,11 +50,11 @@ async function startEc2Instance(label, githubRegistrationToken) {
   const userData = buildUserDataScript(githubRegistrationToken, label);
   const subnetIds = JSON.parse(config.input.subnetIds); 
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
-  const volumeSize = parseInt(config.input["ebs-volume-size"], 10);
+  const volumeSize = parseInt(config.input.ebsVolumeSize, 10);
   const blockDeviceMappings = Number.isInteger(volumeSize)
     ? [
         {
-          DeviceName: "/dev/sdh",
+          DeviceName: config.input.ebsVolumeDeviceName,
           Ebs: { VolumeSize: volumeSize }
         }
       ]
