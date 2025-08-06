@@ -20,6 +20,10 @@ inputs:
       EC2 Image Id (AMI). The new runner will be launched from this image.
       This input is required if you use the 'start' mode.
     required: false
+  ebs-volume-size:
+    description: >-
+      EBS Volume Size. Size of the volume in gibibytes. If not defined, EC2 Instance will use AMI defaule volume size. 
+    required: false
   ec2-instance-types:
     description: >-
       EC2 Instance Types. The runner will be launched on the instance of this type.
