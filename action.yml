@@ -22,7 +22,8 @@ inputs:
     required: false
   ebs-volume-device-name:
     description: >-
-      EBS Volume Device Name.  Name of the device to mount (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html). 
+      EBS Volume Device Name.  Name of the device to mount (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html).
+      This input is required if you pass `ebs-volume-size`.
     required: false
   ebs-volume-size:
     description: >-
