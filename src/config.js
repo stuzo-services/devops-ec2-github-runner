@@ -16,6 +16,7 @@ class Config {
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
       marketType: core.getInput('market-type'),
+      ebsVolumeSize: core.getInput('ebs-volume-size'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
