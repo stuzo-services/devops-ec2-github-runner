@@ -197,6 +197,8 @@ Now you're ready to go!
 | `mode`                                                                                                                                                                       | Always required.                           | Specify here which mode you want to use: <br> - `start` - to start a new runner; <br> - `stop` - to stop the previously created runner.                                                                                                                                                                                               |
 | `github-token`                                                                                                                                                               | Always required.                           | GitHub Personal Access Token with the `repo` scope assigned.                                                                                                                                                                                                                                                                          |
 | `ec2-image-id`                                                                                                                                                               | Required if you use the `start` mode.      | EC2 Image Id (AMI). <br><br> The new runner will be launched from this image. <br><br> The action is compatible with Amazon Linux 2 images.                                                                                                                                                                                           |
+| `ebs-volume-device-name`                                                                                                                                                               | Required if you pass the`ebs-volume-size`.      | EBS Volume Device Name. <br><br> Size of the volume in gibibytes. If not defined, EC2 Instance will use AMI defaule volume size.                                                                                                                      |
+| `ebs-volume-size`                                                                                                                                                               | Optional     | EBS Volume Size.. <br><br> Name of the device to mount (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html).                                                                                                                      |
 | `ec2-instance-types` | Required if you use the `start` mode. | EC2 Instance Types. <br><br> A stringified JSON array of instance types, for example `'["t3.nano", "t3.micro"]'`. <br><br> The action tries the types in the given order and falls back to the next one if AWS reports `InsufficientInstanceCapacity`. |
 | `subnet-ids` | Required if you use the `start` mode. | VPC Subnet Ids. <br><br> A stringified JSON array of subnet ids, for example `'["subnet-123", "subnet-456"]'`. <br><br> The subnets should belong to the same VPC as the specified security group. |
 | `security-group-id`                                                                                                                                                          | Required if you use the `start` mode.      | EC2 Security Group Id. <br><br> The security group should belong to the same VPC as the specified subnet. <br><br> Only the outbound traffic for port 443 should be allowed. No inbound traffic is required.                                                                                                                          |
@@ -254,6 +256,8 @@ jobs:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-123
+          ebs-volume-device-name: /dev/sda1 # optional
+          ebs-volume-size: 20 # optional
           ec2-instance-types: '["t3.nano", "t3.micro"]'
           subnet-ids: '["subnet-123", "subnet-456"]'
           market-type: spot # optional, use a spot instance instead of on-demand
@@ -307,6 +311,7 @@ This fork ([stuzo-services/devops-ec2-github-runner](https://github.com/stuzo-se
 - `ec2-instance-type` is replaced by `ec2-instance-types` (JSON array, tried in order on capacity errors).
 - `subnet-id` is replaced by `subnet-ids` (JSON array).
 - New `market-type` input to launch spot instances.
+- New `ebs-volume-device-name` and `ebs-volume-size` inputs to override the root volume size.
 - Uses AWS SDK v3 and runs on Node 24 (`runs.using: node24`).
 
 Replace `machulav/ec2-github-runner@v2` in the examples with this fork's reference when you use it.

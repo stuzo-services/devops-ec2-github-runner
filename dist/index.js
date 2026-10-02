@@ -146335,8 +146335,8 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `echo "${config.input.preRunnerScript}" > pre-runner-script.sh`,
       'source pre-runner-script.sh',
       'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
-      'curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-${RUNNER_ARCH}-2.317.0.tar.gz',
-      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.317.0.tar.gz',
+      'curl -O -L https://github.com/actions/runner/releases/download/v2.335.1/actions-runner-linux-${RUNNER_ARCH}-2.335.1.tar.gz',
+      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.335.1.tar.gz',
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label}`,
       './run.sh',
@@ -146360,11 +146360,19 @@ function buildMarketOptions() {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
   const userData = buildUserDataScript(githubRegistrationToken, label);
-
-  const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
   const subnetIds = JSON.parse(config.input.subnetIds);
+  const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
+  const volumeSize = parseInt(config.input.ebsVolumeSize, 10);
+  const blockDeviceMappings = Number.isInteger(volumeSize)
+    ? [
+        {
+          DeviceName: config.input.ebsVolumeDeviceName,
+          Ebs: { VolumeSize: volumeSize }
+        }
+      ]
+    : undefined; // Let AMI default be used
 
-  // Capacity is per availability zone, so try every instance type in every subnet
+  
   for (const instanceType of instanceTypes) {
     for (const subnetId of subnetIds) {
       const params = {
@@ -146378,18 +146386,19 @@ async function startEc2Instance(label, githubRegistrationToken) {
         IamInstanceProfile: { Name: config.input.iamRoleName },
         TagSpecifications: config.tagSpecifications,
         InstanceMarketOptions: buildMarketOptions(),
+        BlockDeviceMappings: blockDeviceMappings,
       };
 
       try {
         const result = await ec2.runInstances(params);
         const ec2InstanceId = result.Instances[0].InstanceId;
-        core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} is started in subnet ${subnetId}`);
+        core.info(`AWS EC2 instance ${ec2InstanceId} of type ${instanceType} started in subnet ${subnetId}`);
         return ec2InstanceId;
       } catch (error) {
         if (error.name === 'InsufficientInstanceCapacity') {
-          core.warning(`Insufficient capacity for instance type ${instanceType} in subnet ${subnetId}, trying next option...`);
+          core.warning(`Insufficient capacity for instance type ${instanceType} in subnet ${subnetId}, trying next...`);
         } else {
-          core.error('AWS EC2 instance starting error: ' + error.message);
+          core.error(`Failed to start instance type ${instanceType} in subnet ${subnetId}: ${error.message}`);
           throw error;
         }
       }
@@ -146466,6 +146475,8 @@ class Config {
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
       marketType: core.getInput('market-type'),
+      ebsVolumeDeviceName: core.getInput('ebs-volume-device-name'),
+      ebsVolumeSize: core.getInput('ebs-volume-size'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
