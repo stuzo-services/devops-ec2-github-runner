@@ -146360,7 +146360,7 @@ function buildMarketOptions() {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
   const userData = buildUserDataScript(githubRegistrationToken, label);
-  const subnetIds = JSON.parse(config.input.subnetIds); 
+  const subnetIds = JSON.parse(config.input.subnetIds);
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
   const volumeSize = parseInt(config.input.ebsVolumeSize, 10);
   const blockDeviceMappings = Number.isInteger(volumeSize)
@@ -146513,7 +146513,7 @@ class Config {
         throw new Error(`Not all the required inputs are provided for the 'start' mode`);
       }
 
-      if (this.marketType?.length > 0 && this.input.marketType !== 'spot') {
+      if (this.input.marketType && this.input.marketType !== 'spot') {
         throw new Error(`Invalid 'market-type' input. Allowed values: spot.`);
       }
     } else if (this.input.mode === 'stop') {

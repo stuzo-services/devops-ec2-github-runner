@@ -23,8 +23,8 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `echo "${config.input.preRunnerScript}" > pre-runner-script.sh`,
       'source pre-runner-script.sh',
       'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
-      'curl -O -L https://github.com/actions/runner/releases/download/v2.335.1/actions-runner-linux-${RUNNER_ARCH}-2.335.1.tar.gz',
-      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.335.1.tar.gz',
+      'curl -O -L https://github.com/actions/runner/releases/download/v2.337.0/actions-runner-linux-${RUNNER_ARCH}-2.337.0.tar.gz',
+      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.337.0.tar.gz',
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label}`,
       './run.sh',
@@ -48,7 +48,7 @@ function buildMarketOptions() {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new EC2();
   const userData = buildUserDataScript(githubRegistrationToken, label);
-  const subnetIds = JSON.parse(config.input.subnetIds); 
+  const subnetIds = JSON.parse(config.input.subnetIds);
   const instanceTypes = JSON.parse(config.input.ec2InstanceTypes);
   const volumeSize = parseInt(config.input.ebsVolumeSize, 10);
   const blockDeviceMappings = Number.isInteger(volumeSize)
